@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@300;400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@300;400;500&display=swap');
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
@@ -49,6 +49,23 @@ All colors MUST be HSL.
     --charcoal: 24 15% 6%;
     --cream: 38 30% 88%;
 
+    /* Glass surfaces (cinematic glassmorphism) */
+    --glass-tint: 24 12% 10%;
+    --glass-alpha: 0.35;
+    --glass-alpha-strong: 0.62;
+
+    --glass-border: 38 30% 88%;
+    --glass-border-alpha: 0.14;
+    --glass-highlight-alpha: 0.10;
+
+    --glass-blur: 14px;
+    --glass-saturation: 1.25;
+    --glass-shadow: 0 20px 60px hsl(0 0% 0% / 0.55);
+
+    --glass-radius: 1rem;
+    --hud-line-alpha: 0.06;
+    --noise-opacity: 0.05;
+
     --sidebar-background: 24 15% 6%;
     --sidebar-foreground: 38 30% 88%;
     --sidebar-primary: 38 65% 58%;
@@ -94,5 +111,84 @@ All colors MUST be HSL.
 
   .border-sand {
     border-color: hsl(var(--sand));
+  }
+
+  /* Glass surface primitive (fallback-first, blur via progressive enhancement) */
+  .glass-surface {
+    background-color: hsl(var(--glass-tint) / var(--glass-alpha-strong));
+    border: 1px solid hsl(var(--glass-border) / var(--glass-border-alpha));
+    border-radius: var(--glass-surface-radius, var(--glass-radius));
+    box-shadow: var(--glass-surface-shadow, var(--glass-shadow));
+    isolation: isolate;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .glass-surface::before {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      hsl(var(--glass-border) / var(--glass-highlight-alpha)),
+      transparent 45%
+    );
+    opacity: 0.9;
+  }
+
+  .glass-surface[data-variant="strong"] {
+    background-color: hsl(var(--glass-tint) / var(--glass-alpha-strong));
+  }
+
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass-surface {
+      background-color: hsl(var(--glass-tint) / var(--glass-alpha));
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+      backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    }
+
+    .glass-surface[data-variant="strong"] {
+      background-color: hsl(var(--glass-tint) / var(--glass-alpha-strong));
+    }
+  }
+
+  /* Decorative overlays (static, subtle; intended for bounded use only) */
+  .glass-grid {
+    background-image:
+      linear-gradient(
+        to right,
+        hsl(var(--glass-border) / var(--hud-line-alpha)) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        hsl(var(--glass-border) / var(--hud-line-alpha)) 1px,
+        transparent 1px
+      );
+    background-size: 64px 64px;
+    background-position: 0 0;
+  }
+
+  .glass-noise {
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27120%27%20height%3D%27120%27%20viewBox%3D%270%200%20120%20120%27%3E%3Cfilter%20id%3D%27n%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%270.8%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27/%3E%3C/filter%3E%3Crect%20width%3D%27120%27%20height%3D%27120%27%20filter%3D%27url(%23n)%27%20opacity%3D%270.35%27/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 180px 180px;
+    opacity: var(--noise-opacity);
+    mix-blend-mode: overlay;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-in,
+  .animate-scroll-bounce {
+    animation: none !important;
+  }
+
+  .animate-fade-up,
+  .animate-fade-in {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

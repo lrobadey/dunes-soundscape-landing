@@ -1,0 +1,4 @@
+interface:
+  display_name: "React Glassmorphism Tech UI"
+  short_description: "Glassmorphism + futuristic tech UI patterns"
+  default_prompt: "Use $react-glassmorphism-tech-ui to design and implement a glassmorphism, HUD-like React UI with accessible, performant surfaces."

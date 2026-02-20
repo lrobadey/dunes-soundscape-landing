@@ -1,0 +1,126 @@
+:global(:root) {
+  --glass-bg: rgb(255 255 255 / 0.12);
+  --glass-bg-strong: rgb(255 255 255 / 0.20);
+  --glass-border: rgb(255 255 255 / 0.22);
+  --glass-shadow: 0 20px 60px rgb(0 0 0 / 0.25);
+  --glass-blur: 14px;
+
+  --text: rgb(255 255 255 / 0.92);
+  --text-muted: rgb(255 255 255 / 0.70);
+
+  --radius: 18px;
+  --focus-ring: 2px solid rgb(255 255 255 / 0.85);
+}
+
+@media (prefers-color-scheme: light) {
+  :global(:root) {
+    --glass-bg: rgb(255 255 255 / 0.55);
+    --glass-bg-strong: rgb(255 255 255 / 0.75);
+    --glass-border: rgb(0 0 0 / 0.10);
+    --glass-shadow: 0 14px 40px rgb(0 0 0 / 0.18);
+
+    --text: rgb(20 20 20 / 0.92);
+    --text-muted: rgb(20 20 20 / 0.65);
+    --focus-ring: 2px solid rgb(20 20 20 / 0.75);
+  }
+}
+
+.card {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 18px 18px 16px;
+  border-radius: var(--radius);
+  text-align: left;
+
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  color: var(--text);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  }
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+
+  background:
+    radial-gradient(120% 70% at 10% 0%, rgb(255 255 255 / 0.30), transparent 55%),
+    radial-gradient(80% 60% at 90% 100%, rgb(255 255 255 / 0.16), transparent 60%);
+  mix-blend-mode: overlay;
+  opacity: 0.45;
+}
+
+.header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.icon {
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+
+  background: rgb(255 255 255 / 0.12);
+  border: 1px solid rgb(255 255 255 / 0.16);
+}
+
+.headerText {
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+}
+
+.description {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.body {
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.interactive {
+  cursor: pointer;
+  user-select: none;
+}
+
+.interactive:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.interactive:hover {
+  transform: translateY(-1px);
+  transition: transform 160ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive:hover {
+    transform: none;
+    transition: none;
+  }
+}
+

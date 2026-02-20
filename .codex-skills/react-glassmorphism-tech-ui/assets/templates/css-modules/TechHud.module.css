@@ -1,0 +1,162 @@
+.hud {
+  position: relative;
+  width: min(680px, 100%);
+  aspect-ratio: 3 / 1;
+  border-radius: 18px;
+  overflow: hidden;
+  padding: 14px 14px 10px;
+
+  background: rgb(10 12 16 / 0.55);
+  border: 1px solid rgb(140 255 255 / 0.18);
+  box-shadow: 0 26px 70px rgb(0 0 0 / 0.45);
+
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 220ms ease-out, transform 220ms ease-out;
+}
+
+.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .hud {
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+  }
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(800px 300px at 35% 20%, rgb(0 255 255 / 0.14), transparent 60%),
+    radial-gradient(800px 300px at 70% 70%, rgb(255 0 200 / 0.10), transparent 60%);
+  opacity: 0.85;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgb(140 255 255 / 0.22);
+  background: rgb(0 0 0 / 0.20);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgb(140 255 255 / 0.95);
+  box-shadow: 0 0 18px rgb(140 255 255 / 0.55);
+  display: inline-block;
+}
+
+.badgeText {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(210 255 255 / 0.92);
+}
+
+.readout {
+  display: inline-flex;
+  gap: 10px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: rgb(210 255 255 / 0.70);
+  text-transform: uppercase;
+  align-items: baseline;
+}
+
+.readoutValue {
+  color: rgb(210 255 255 / 0.95);
+}
+
+.svg {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: calc(100% - 36px);
+  margin-top: 6px;
+}
+
+.line {
+  stroke: rgb(140 255 255 / 0.85);
+  stroke-width: 2;
+  fill: none;
+}
+
+.lineDim {
+  stroke: rgb(140 255 255 / 0.22);
+  stroke-width: 1;
+  fill: none;
+}
+
+.ring {
+  stroke: rgb(140 255 255 / 0.55);
+  stroke-width: 2;
+  fill: none;
+}
+
+.ringDim {
+  stroke: rgb(140 255 255 / 0.18);
+  stroke-width: 1;
+  fill: none;
+}
+
+.text {
+  fill: rgb(210 255 255 / 0.90);
+  font-size: 18px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  letter-spacing: 0.12em;
+}
+
+.scan {
+  position: absolute;
+  inset: -40% 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(140 255 255 / 0.10) 45%,
+    rgb(140 255 255 / 0.16) 50%,
+    rgb(140 255 255 / 0.10) 55%,
+    transparent 100%
+  );
+  animation: scan 2.2s linear infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes scan {
+  from {
+    transform: translateY(-12%);
+  }
+  to {
+    transform: translateY(12%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud {
+    transition: none;
+  }
+  .scan {
+    animation: none;
+  }
+}
+
