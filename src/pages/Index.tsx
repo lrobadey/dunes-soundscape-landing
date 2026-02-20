@@ -83,7 +83,7 @@ const Index = () => {
               className="mt-4 font-display text-[clamp(1rem,3vw,1.6rem)] font-light italic text-sand-light opacity-0 animate-fade-up"
               style={{ animationDelay: "0.7s" }}
             >
-              EP for String Quintet and Electronics
+              An EP for string quintet and electronics
             </p>
 
             {/* Composer */}
