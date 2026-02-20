@@ -113,14 +113,14 @@ const Index = () => {
       </section>
 
       {/* ── OVERVIEW ───────────────────────────────────────────── */}
-      <section className="relative bg-background py-28">
+      <section className="relative bg-background">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_circle_at_50%_0%,hsl(var(--primary)/0.22),transparent_60%)] opacity-70"
         />
         <GlassSurface
           variant="strong"
-          className="relative w-full px-6 py-12 text-center [--glass-surface-radius:0px] sm:px-10 sm:py-14 md:px-12 md:py-16"
+          className="relative flex min-h-[30rem] w-full flex-col justify-center px-6 py-16 text-center [--glass-surface-radius:0px] sm:px-10 sm:py-20 md:min-h-[34rem] md:px-12 md:py-24"
         >
           <p className="mb-5 font-sans text-[10px] uppercase tracking-[0.3em] text-primary">About the Work</p>
           <h2 className="mb-10 font-display text-4xl font-light italic leading-snug text-foreground md:text-5xl">
