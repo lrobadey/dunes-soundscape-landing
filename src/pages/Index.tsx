@@ -72,7 +72,7 @@ const Index = () => {
 
             {/* Title */}
             <h1
-              className="font-display text-[clamp(5rem,18vw,15rem)] font-light leading-none tracking-tight text-cream opacity-0 animate-fade-up"
+              className="font-dunes-title text-[clamp(5rem,18vw,15rem)] font-light leading-none tracking-tight text-cream opacity-0 animate-fade-up"
               style={{ animationDelay: "0.4s" }}
             >
               DUNES
