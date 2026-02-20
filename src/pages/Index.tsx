@@ -67,7 +67,7 @@ const Index = () => {
               className="mb-6 font-sans text-xs uppercase tracking-[0.35em] text-sand opacity-0 animate-fade-in"
               style={{ animationDelay: "0.2s" }}
             >
-              Premiere &amp; Digital Release
+              THE PREMIERE AND DIGITAL RELEASE OF
             </p>
 
             {/* Title */}
