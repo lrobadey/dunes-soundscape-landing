@@ -51,10 +51,16 @@ const Index = () => {
         <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/60 via-black/30 to-black/80" />
         <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/20 via-transparent to-black/20" />
 
-        <GlassSurface
-          variant="strong"
-          className="absolute inset-0 z-10 flex items-center justify-center [--glass-surface-radius:0] [--glass-surface-shadow:none]"
-        >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-10 border border-white/10 bg-[hsl(var(--glass-tint)/var(--glass-alpha-strong))]"
+          style={{
+            WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturation))",
+            backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturation))",
+          }}
+        />
+
+        <div className="relative z-20 flex w-full items-center justify-center">
           <div className="flex w-full max-w-[64rem] flex-col items-center px-6 py-10 text-center sm:px-10 sm:py-12 md:px-12 md:py-14">
             {/* Eyebrow */}
             <p
@@ -97,7 +103,7 @@ const Index = () => {
               <span>May 2, 2026 · Studio G, SFCM</span>
             </div>
           </div>
-        </GlassSurface>
+        </div>
 
         {/* Scroll indicator */}
         <div className="absolute bottom-10 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 opacity-60">
