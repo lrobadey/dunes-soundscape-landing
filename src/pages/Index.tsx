@@ -118,13 +118,16 @@ const Index = () => {
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_circle_at_50%_0%,hsl(var(--primary)/0.22),transparent_60%)] opacity-70"
         />
-        <GlassSurface variant="strong" className="relative mx-auto max-w-2xl px-8 py-10 text-center sm:px-10 sm:py-12">
+        <GlassSurface
+          variant="strong"
+          className="relative mx-auto w-full max-w-[64rem] px-8 py-12 text-center sm:px-12 sm:py-14 md:px-14 md:py-16"
+        >
           <p className="mb-5 font-sans text-[10px] uppercase tracking-[0.3em] text-primary">About the Work</p>
-          <h2 className="mb-8 font-display text-4xl font-light italic leading-snug text-foreground md:text-5xl">
-            A landscape in five movements
+          <h2 className="mb-10 font-display text-[clamp(2.25rem,7vw,5.75rem)] font-light leading-[0.95] tracking-tight text-foreground">
+            Five movements, one landscape.
           </h2>
-          <div className="h-px w-16 bg-primary mx-auto mb-8 opacity-60" />
-          <p className="font-sans text-base font-light leading-relaxed text-muted-foreground">
+          <div className="mx-auto mb-10 h-px w-full bg-primary/45" />
+          <p className="mx-auto max-w-3xl font-sans text-base font-light leading-relaxed text-muted-foreground md:text-lg">
             <em>Dunes</em> is a 25-minute single-arc work for string quintet and electronics, synthesizing contemporary
             classical textures with pop clarity and EDM-scale production. Inspired by the geomorphology and scale of five
             dune systems across the globe, the piece translates natural processes into a visceral musical journey — moving
