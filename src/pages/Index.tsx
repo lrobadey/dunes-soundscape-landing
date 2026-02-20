@@ -113,17 +113,17 @@ const Index = () => {
       </section>
 
       {/* ── OVERVIEW ───────────────────────────────────────────── */}
-      <section className="relative bg-background px-6 py-28">
+      <section className="relative bg-background py-28">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_circle_at_50%_0%,hsl(var(--primary)/0.22),transparent_60%)] opacity-70"
         />
         <GlassSurface
           variant="strong"
-          className="relative mx-auto w-full max-w-[64rem] px-8 py-12 text-center sm:px-12 sm:py-14 md:px-14 md:py-16"
+          className="relative w-full px-6 py-12 text-center [--glass-surface-radius:0px] sm:px-10 sm:py-14 md:px-12 md:py-16"
         >
           <p className="mb-5 font-sans text-[10px] uppercase tracking-[0.3em] text-primary">About the Work</p>
-          <h2 className="mb-10 font-display text-[clamp(2.25rem,7vw,5.75rem)] font-light leading-[0.95] tracking-tight text-foreground">
+          <h2 className="mb-10 font-display text-4xl font-light italic leading-snug text-foreground md:text-5xl">
             Five movements, one landscape.
           </h2>
           <div className="mx-auto mb-10 h-px w-full bg-primary/45" />
