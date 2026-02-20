@@ -51,7 +51,19 @@ const Index = () => {
         <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/60 via-black/30 to-black/80" />
         <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/20 via-transparent to-black/20" />
 
-        <GlassSurface className="relative z-10 mx-auto w-[min(100%,64rem)] px-6 py-10 text-center [--glass-surface-shadow:none] sm:px-10 sm:py-12 md:px-12 md:py-14">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[2] bg-[hsl(var(--glass-tint)/0.2)]"
+          style={{
+            WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturation))",
+            backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturation))",
+          }}
+        />
+
+        <GlassSurface
+          variant="strong"
+          className="relative z-10 mx-auto w-[min(100%,64rem)] px-6 py-10 text-center [--glass-surface-shadow:none] sm:px-10 sm:py-12 md:px-12 md:py-14"
+        >
           <div className="flex flex-col items-center">
             {/* Eyebrow */}
             <p
