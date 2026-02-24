@@ -66,6 +66,17 @@ All colors MUST be HSL.
     --hud-line-alpha: 0.06;
     --noise-opacity: 0.05;
 
+    /* Sand drift (ambient, ultra-subtle) */
+    --sand-drift-opacity-a: 0.08;
+    --sand-drift-opacity-b: 0.055;
+    --sand-drift-opacity-c: 0.035;
+    --sand-drift-speed-a: 72s;
+    --sand-drift-speed-b: 96s;
+    --sand-drift-speed-c: 128s;
+    --sand-drift-size-min: 1.2px;
+    --sand-drift-size-max: 2.4px;
+    --sand-drift-blur: 0.7px;
+
     --sidebar-background: 24 15% 6%;
     --sidebar-foreground: 38 30% 88%;
     --sidebar-primary: 38 65% 58%;
@@ -89,6 +100,48 @@ All colors MUST be HSL.
 
   h1, h2, h3, h4 {
     font-family: 'Cormorant Garamond', Georgia, serif;
+  }
+}
+
+@keyframes sand-drift-a {
+  0% {
+    transform: translate3d(-8%, -1%, 0);
+  }
+
+  50% {
+    transform: translate3d(2%, 1%, 0);
+  }
+
+  100% {
+    transform: translate3d(12%, -1%, 0);
+  }
+}
+
+@keyframes sand-drift-b {
+  0% {
+    transform: translate3d(-12%, 1%, 0);
+  }
+
+  50% {
+    transform: translate3d(-2%, -1%, 0);
+  }
+
+  100% {
+    transform: translate3d(10%, 1%, 0);
+  }
+}
+
+@keyframes sand-drift-c {
+  0% {
+    transform: translate3d(-6%, 0%, 0);
+  }
+
+  50% {
+    transform: translate3d(4%, -1%, 0);
+  }
+
+  100% {
+    transform: translate3d(14%, 0%, 0);
   }
 }
 
@@ -181,6 +234,113 @@ All colors MUST be HSL.
     opacity: var(--noise-opacity);
     mix-blend-mode: overlay;
   }
+
+  .sand-drift {
+    position: absolute;
+    overflow: hidden;
+    isolation: isolate;
+    --sand-drift-intensity: 1;
+  }
+
+  .sand-drift[data-intensity="soft"] {
+    --sand-drift-intensity: 1.35;
+  }
+
+  .sand-drift-layer {
+    pointer-events: none;
+    position: absolute;
+    inset: -16% -24%;
+    background-repeat: repeat;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+
+  .sand-drift-mask-hero {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 88%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 88%, transparent 100%);
+  }
+
+  .sand-drift-mask-transition {
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, hsl(0 0% 0% / 0.72) 36%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, hsl(0 0% 0% / 0.72) 36%, transparent 100%);
+  }
+
+  .sand-drift-layer-a {
+    background-image:
+      radial-gradient(
+        circle at 16% 24%,
+        hsl(var(--sand-light) / 0.96) 0 var(--sand-drift-size-min),
+        transparent calc(var(--sand-drift-size-min) * 2)
+      ),
+      radial-gradient(
+        circle at 68% 64%,
+        hsl(var(--sand) / 0.85) 0 var(--sand-drift-size-min),
+        transparent calc(var(--sand-drift-size-min) * 2)
+      ),
+      radial-gradient(
+        circle at 42% 82%,
+        hsl(var(--cream) / 0.72) 0 var(--sand-drift-size-max),
+        transparent calc(var(--sand-drift-size-max) * 2)
+      );
+    background-size: 220px 160px, 260px 190px, 300px 220px;
+    opacity: calc(var(--sand-drift-opacity-a) * var(--sand-drift-intensity));
+    animation: sand-drift-a var(--sand-drift-speed-a) linear infinite;
+  }
+
+  .sand-drift-layer-b {
+    background-image:
+      linear-gradient(
+        112deg,
+        transparent 46%,
+        hsl(var(--sand-light) / 0.72) 49%,
+        hsl(var(--sand-light) / 0.72) 50%,
+        transparent 53%
+      ),
+      linear-gradient(
+        108deg,
+        transparent 47%,
+        hsl(var(--sand) / 0.62) 50%,
+        hsl(var(--sand) / 0.62) 51%,
+        transparent 54%
+      );
+    background-size: 230px 150px, 280px 190px;
+    mix-blend-mode: screen;
+    opacity: calc(var(--sand-drift-opacity-b) * var(--sand-drift-intensity));
+    animation: sand-drift-b var(--sand-drift-speed-b) linear infinite;
+  }
+
+  .sand-drift-layer-c {
+    background-image:
+      radial-gradient(
+        ellipse at 28% 36%,
+        hsl(var(--sand-light) / 0.45) 0 calc(var(--sand-drift-size-max) * 1.8),
+        transparent calc(var(--sand-drift-size-max) * 3.6)
+      ),
+      radial-gradient(
+        ellipse at 78% 58%,
+        hsl(var(--sand) / 0.38) 0 calc(var(--sand-drift-size-max) * 2),
+        transparent calc(var(--sand-drift-size-max) * 3.8)
+      );
+    background-size: 380px 280px, 460px 320px;
+    mix-blend-mode: screen;
+    filter: blur(var(--sand-drift-blur));
+    opacity: calc(var(--sand-drift-opacity-c) * var(--sand-drift-intensity));
+    animation: sand-drift-c var(--sand-drift-speed-c) linear infinite;
+  }
+}
+
+@media (max-width: 768px) {
+  .sand-drift-layer-a {
+    opacity: calc(var(--sand-drift-opacity-a) * 0.68);
+  }
+
+  .sand-drift-layer-b {
+    opacity: calc(var(--sand-drift-opacity-b) * 0.62);
+  }
+
+  .sand-drift-layer-c {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -194,5 +354,24 @@ All colors MUST be HSL.
   .animate-fade-in {
     opacity: 1 !important;
     transform: none !important;
+  }
+
+  .sand-drift-layer-a,
+  .sand-drift-layer-b,
+  .sand-drift-layer-c {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .sand-drift-layer-a {
+    opacity: calc(var(--sand-drift-opacity-a) * 0.45) !important;
+  }
+
+  .sand-drift-layer-b {
+    opacity: calc(var(--sand-drift-opacity-b) * 0.45) !important;
+  }
+
+  .sand-drift-layer-c {
+    opacity: calc(var(--sand-drift-opacity-c) * 0.35) !important;
   }
 }
