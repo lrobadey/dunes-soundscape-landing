@@ -1,0 +1,100 @@
+import type { SandPreset, SandPresetName } from "@/motion/sand/types";
+
+export const sandPresets: Record<SandPresetName, SandPreset> = {
+  faint: {
+    density: 1,
+    layers: [
+      {
+        id: "near",
+        count: 34,
+        duration: 120,
+        size: { min: 0.95, max: 1.7 },
+        opacity: { min: 0.12, max: 0.24 },
+        drift: { from: -6, to: 8, sway: 0.6 },
+        blur: 0,
+      },
+      {
+        id: "mid",
+        count: 24,
+        duration: 148,
+        size: { min: 0.8, max: 1.5 },
+        opacity: { min: 0.08, max: 0.18 },
+        drift: { from: -8, to: 10, sway: 0.8 },
+        blur: 0.25,
+      },
+      {
+        id: "far",
+        count: 16,
+        duration: 176,
+        size: { min: 0.7, max: 1.2 },
+        opacity: { min: 0.06, max: 0.14 },
+        drift: { from: -10, to: 12, sway: 1 },
+        blur: 0.45,
+      },
+    ],
+  },
+  subtle: {
+    density: 1.22,
+    layers: [
+      {
+        id: "near",
+        count: 44,
+        duration: 108,
+        size: { min: 1, max: 1.8 },
+        opacity: { min: 0.15, max: 0.28 },
+        drift: { from: -7, to: 9, sway: 0.7 },
+        blur: 0,
+      },
+      {
+        id: "mid",
+        count: 30,
+        duration: 136,
+        size: { min: 0.84, max: 1.6 },
+        opacity: { min: 0.11, max: 0.21 },
+        drift: { from: -9, to: 11, sway: 0.9 },
+        blur: 0.28,
+      },
+      {
+        id: "far",
+        count: 20,
+        duration: 164,
+        size: { min: 0.72, max: 1.3 },
+        opacity: { min: 0.08, max: 0.16 },
+        drift: { from: -11, to: 13, sway: 1.1 },
+        blur: 0.5,
+      },
+    ],
+  },
+  soft: {
+    density: 1.38,
+    layers: [
+      {
+        id: "near",
+        count: 56,
+        duration: 96,
+        size: { min: 1.05, max: 1.95 },
+        opacity: { min: 0.18, max: 0.32 },
+        drift: { from: -8, to: 10, sway: 0.8 },
+        blur: 0.04,
+      },
+      {
+        id: "mid",
+        count: 38,
+        duration: 124,
+        size: { min: 0.88, max: 1.7 },
+        opacity: { min: 0.13, max: 0.24 },
+        drift: { from: -10, to: 12, sway: 1 },
+        blur: 0.32,
+      },
+      {
+        id: "far",
+        count: 26,
+        duration: 152,
+        size: { min: 0.74, max: 1.4 },
+        opacity: { min: 0.1, max: 0.18 },
+        drift: { from: -12, to: 14, sway: 1.2 },
+        blur: 0.58,
+      },
+    ],
+  },
+};

@@ -33,7 +33,9 @@ const Index = () => {
   const calendarLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=DUNES+Premiere+%E2%80%94+Luca+Robadey&dates=20260502T190000/20260502T210000&details=Premiere+of+DUNES+for+string+quintet+and+electronics+by+Luca+Robadey.+Live+performance+with+lighting+and+projections.&location=Studio+G,+San+Francisco+Conservatory+of+Music`;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
+      <SandDriftOverlay variant="page" intensity="faint" className="z-[2]" />
+      <div className="relative z-10">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
       <section
@@ -50,7 +52,6 @@ const Index = () => {
         {/* Cinematic gradient overlay */}
         <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/60 via-black/30 to-black/80" />
         <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/20 via-transparent to-black/20" />
-        <SandDriftOverlay variant="hero" intensity="subtle" className="z-[5]" />
 
         <div
           aria-hidden="true"
@@ -119,7 +120,6 @@ const Index = () => {
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_circle_at_50%_0%,hsl(var(--primary)/0.22),transparent_60%)] opacity-70"
         />
-        <SandDriftOverlay variant="transition" intensity="subtle" className="z-[1]" />
         <GlassSurface
           variant="strong"
           className="relative z-10 flex min-h-[30rem] w-full flex-col justify-center px-6 py-16 text-center [--glass-surface-radius:0px] sm:px-10 sm:py-20 md:min-h-[34rem] md:px-12 md:py-24"
@@ -140,7 +140,6 @@ const Index = () => {
 
       {/* ── MOVEMENTS ──────────────────────────────────────────── */}
       <section className="relative bg-card px-6 py-28">
-        <SandDriftOverlay variant="transition" intensity="subtle" className="z-[1]" />
         <div className="relative z-10 mx-auto max-w-3xl">
           <div className="mb-16 text-center">
             <p className="mb-5 font-sans text-[10px] uppercase tracking-[0.3em] text-primary">Movements</p>
@@ -179,7 +178,6 @@ const Index = () => {
 
       {/* ── EVENT DETAILS ──────────────────────────────────────── */}
       <section className="relative bg-background px-6 py-28">
-        <SandDriftOverlay variant="transition" intensity="subtle" className="z-[1]" />
         <div className="relative z-10 mx-auto max-w-3xl">
           <div className="mb-16 text-center">
             <p className="mb-5 font-sans text-[10px] uppercase tracking-[0.3em] text-primary">Performance</p>
@@ -234,7 +232,6 @@ const Index = () => {
           background: "linear-gradient(to bottom, hsl(var(--card)), hsl(var(--background)))",
         }}
       >
-        <SandDriftOverlay variant="transition" intensity="subtle" className="z-[1]" />
         <GlassSurface variant="strong" className="relative z-10 mx-auto max-w-lg px-8 py-10 text-center sm:px-10 sm:py-12">
           <p className="mb-5 font-sans text-[10px] uppercase tracking-[0.3em] text-primary">Stay Informed</p>
           <h2 className="mb-4 font-display text-4xl font-light text-foreground md:text-5xl">Notify Me</h2>
@@ -303,6 +300,7 @@ const Index = () => {
           </p>
         </div>
       </footer>
+      </div>
     </div>
   );
 };
