@@ -13,7 +13,7 @@ type SandWindOverlayProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 const maskClassByVariant: Record<SandMaskVariant, string> = {
-  page: "sand-wind-mask-page absolute inset-0",
+  page: "sand-wind-mask-page fixed inset-0",
   hero: "sand-wind-mask-hero absolute inset-0",
   transition: "sand-wind-mask-transition absolute inset-x-0 top-0 h-36",
 };

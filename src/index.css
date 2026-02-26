@@ -81,7 +81,7 @@ All colors MUST be HSL.
     --sand-wind-color: 42 42% 82%;
     --sand-wind-opacity-scale: 1;
     --sand-wind-reduced-opacity: 0.45;
-    --sand-wind-glow: 0.18;
+    --sand-wind-glow: 0.45;
     --sand-wind-layer-density: 1;
 
     --sidebar-background: 24 15% 6%;
@@ -257,11 +257,11 @@ All colors MUST be HSL.
   }
 
   .sand-wind[data-intensity="subtle"] {
-    --sand-wind-opacity-scale: 1.1;
+    --sand-wind-opacity-scale: 1.45;
   }
 
   .sand-wind[data-intensity="soft"] {
-    --sand-wind-opacity-scale: 1.2;
+    --sand-wind-opacity-scale: 2.15;
   }
 
   .sand-wind-layer {
@@ -275,14 +275,14 @@ All colors MUST be HSL.
     position: absolute;
     border-radius: 9999px;
     background: hsl(var(--sand-wind-color) / 0.96);
-    box-shadow: 0 0 6px hsl(var(--sand-light) / var(--sand-wind-glow));
+    box-shadow: 0 0 10px hsl(var(--sand-light) / var(--sand-wind-glow));
     transform: translate3d(0, 0, 0);
     opacity: calc(var(--grain-opacity, 0.1) * var(--sand-wind-opacity-scale));
   }
 
   .sand-wind-mask-page {
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 3%, #000 97%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 3%, #000 97%, transparent 100%);
   }
 
   .sand-wind-mask-hero {
@@ -384,11 +384,11 @@ All colors MUST be HSL.
 
 @media (max-width: 768px) {
   .sand-wind[data-intensity="subtle"] {
-    --sand-wind-opacity-scale: 0.95;
+    --sand-wind-opacity-scale: 1.2;
   }
 
   .sand-wind[data-intensity="soft"] {
-    --sand-wind-opacity-scale: 1.05;
+    --sand-wind-opacity-scale: 1.7;
   }
 
   .sand-drift-layer-a {
