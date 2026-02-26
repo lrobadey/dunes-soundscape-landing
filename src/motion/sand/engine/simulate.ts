@@ -14,6 +14,12 @@ const clamp = (value: number, min: number, max: number) => {
 
 const isFiniteNumber = (value: number) => Number.isFinite(value);
 
+const LIFECYCLE_INACTIVE = 0;
+const LIFECYCLE_ACTIVE = 1;
+const LIFECYCLE_RETIRING = 2;
+
+type RetireReason = "trim-excess" | "out-of-bounds" | "ttl-expired";
+
 const getLayerProfileByIndex = (state: SandSimulationState, layerIndex: number) => {
   return state.config.layerProfiles[layerIndex] ?? state.config.layerProfiles[0];
 };
@@ -55,12 +61,31 @@ const allocateSlot = (state: SandSimulationState) => {
   return -1;
 };
 
-const deactivateParticle = (state: SandSimulationState, index: number) => {
-  if (state.active[index] === 0) {
+const hardDeactivateParticle = (state: SandSimulationState, index: number) => {
+  if (state.active[index] === 1) {
+    state.activeCount = Math.max(0, state.activeCount - 1);
+  }
+
+  state.active[index] = LIFECYCLE_INACTIVE;
+  state.lifecycle[index] = LIFECYCLE_INACTIVE;
+  state.fade[index] = 0;
+  state.fadeRate[index] = 0;
+  state.ageNorm[index] = 0;
+  state.life[index] = 0;
+  state.ttl[index] = 1;
+};
+
+const retireParticle = (state: SandSimulationState, index: number, reason: RetireReason) => {
+  if (state.active[index] === 0 || state.lifecycle[index] === LIFECYCLE_RETIRING) {
     return;
   }
-  state.active[index] = 0;
-  state.activeCount = Math.max(0, state.activeCount - 1);
+
+  const fadeOutMin = reason === "out-of-bounds" ? state.config.fadeOutSecMin * 0.9 : state.config.fadeOutSecMin;
+  const fadeOutMax = reason === "out-of-bounds" ? state.config.fadeOutSecMax * 0.95 : state.config.fadeOutSecMax;
+  const fadeOutSec = randomBetween(fadeOutMin, fadeOutMax, state.random);
+
+  state.lifecycle[index] = LIFECYCLE_RETIRING;
+  state.fadeRate[index] = -1 / Math.max(0.001, fadeOutSec);
 };
 
 const placeSpawnPosition = (
@@ -99,8 +124,13 @@ const spawnParticle = (
   const profile = getLayerProfileByIndex(state, layerIndex);
   const margin = getSpawnMargin(state);
 
+  if (state.active[index] === 0) {
+    state.activeCount += 1;
+  }
+
   state.layer[index] = layerIndex;
   state.active[index] = 1;
+  state.lifecycle[index] = LIFECYCLE_ACTIVE;
 
   placeSpawnPosition(state, index, headingCos, headingSin, margin, initialFill);
 
@@ -116,6 +146,7 @@ const spawnParticle = (
 
   state.ttl[index] = randomBetween(profile.ttlMin, profile.ttlMax, state.random);
   state.life[index] = initialFill ? randomBetween(0, state.ttl[index], state.random) : 0;
+  state.ageNorm[index] = clamp(state.life[index] / Math.max(0.001, state.ttl[index]), 0, 1);
 
   if (!initialFill) {
     const initialSpeed = profile.baseSpeed * (0.7 + signal.gust * 0.35);
@@ -126,27 +157,73 @@ const spawnParticle = (
     state.vy[index] = randomBetween(-1.8, 1.8, state.random);
   }
 
-  state.activeCount += 1;
+  if (initialFill) {
+    state.fade[index] = 1;
+    state.fadeRate[index] = 0;
+    return;
+  }
+
+  const fadeInSec = randomBetween(state.config.fadeInSecMin, state.config.fadeInSecMax, state.random);
+  state.fade[index] = 0;
+  state.fadeRate[index] = 1 / Math.max(0.001, fadeInSec);
 };
 
-const trimExcessParticles = (state: SandSimulationState, excessCount: number) => {
+const retireExcessParticles = (state: SandSimulationState, excessCount: number) => {
   if (excessCount <= 0 || state.activeCount <= 0) {
     return;
   }
 
-  let remaining = excessCount;
-  const stride = Math.max(1, Math.floor(state.capacity / Math.max(8, excessCount * 2)));
-  let cursor = Math.floor(state.random() * state.capacity);
+  const selected: number[] = [];
+  const targetSelectionCount = Math.min(excessCount, state.activeCount);
 
-  for (let step = 0; step < state.capacity && remaining > 0; step += 1) {
-    cursor = (cursor + stride) % state.capacity;
+  for (let selectIndex = 0; selectIndex < targetSelectionCount; selectIndex += 1) {
+    let bestIndex = -1;
+    let bestAge = -1;
+    let bestLayer = -1;
+    let bestScanOrder = Number.POSITIVE_INFINITY;
 
-    if (state.active[cursor] === 0) {
-      continue;
+    for (let step = 0; step < state.capacity; step += 1) {
+      const index = (state.spawnCursor + step) % state.capacity;
+      if (state.active[index] === 0 || state.lifecycle[index] !== LIFECYCLE_ACTIVE) {
+        continue;
+      }
+
+      let alreadySelected = false;
+      for (let candidateIndex = 0; candidateIndex < selected.length; candidateIndex += 1) {
+        if (selected[candidateIndex] === index) {
+          alreadySelected = true;
+          break;
+        }
+      }
+
+      if (alreadySelected) {
+        continue;
+      }
+
+      const age = state.life[index] / Math.max(0.001, state.ttl[index]);
+      const layerIndex = state.layer[index];
+      const hasBetterAge = age > bestAge + 1e-6;
+      const sameAge = Math.abs(age - bestAge) <= 1e-6;
+      const hasBetterLayer = sameAge && layerIndex > bestLayer;
+      const hasBetterOrder = sameAge && layerIndex === bestLayer && step < bestScanOrder;
+
+      if (hasBetterAge || hasBetterLayer || hasBetterOrder) {
+        bestIndex = index;
+        bestAge = age;
+        bestLayer = layerIndex;
+        bestScanOrder = step;
+      }
     }
 
-    deactivateParticle(state, cursor);
-    remaining -= 1;
+    if (bestIndex === -1) {
+      break;
+    }
+
+    selected.push(bestIndex);
+  }
+
+  for (let i = 0; i < selected.length; i += 1) {
+    retireParticle(state, selected[i], "trim-excess");
   }
 };
 
@@ -157,8 +234,7 @@ const sanitizeParticle = (state: SandSimulationState, index: number) => {
     !isFiniteNumber(state.vx[index]) ||
     !isFiniteNumber(state.vy[index])
   ) {
-    state.active[index] = 0;
-    state.activeCount = Math.max(0, state.activeCount - 1);
+    hardDeactivateParticle(state, index);
   }
 };
 
@@ -181,7 +257,12 @@ export const createSandSimulation = (config: SandRuntimeConfig): SandSimulationS
     alpha: new Float32Array(capacity),
     layer: new Uint8Array(capacity),
     active: new Uint8Array(capacity),
+    lifecycle: new Uint8Array(capacity),
+    fade: new Float32Array(capacity),
+    fadeRate: new Float32Array(capacity),
+    ageNorm: new Float32Array(capacity),
     spawnCursor: 0,
+    targetActiveSmoothed: 0,
     random: createSeededRandom(`${config.seed}:${config.intensity}:${config.stormStyle}:particles`),
   };
 
@@ -218,6 +299,7 @@ export const createSandSimulation = (config: SandRuntimeConfig): SandSimulationS
   }
 
   state.spawnCursor = initialCount % capacity;
+  state.targetActiveSmoothed = state.activeCount;
 
   return state;
 };
@@ -268,7 +350,10 @@ export const stepSandSimulation = (state: SandSimulationState, input: SandStepIn
   const headingSin = Math.sin(heading);
 
   const margin = getSpawnMargin(state);
-  const targetActiveCount = computeTargetActiveCount(state, input);
+  const targetActiveRaw = computeTargetActiveCount(state, input);
+  state.targetActiveSmoothed +=
+    (targetActiveRaw - state.targetActiveSmoothed) * clamp(dt * 1.8, 0, 1);
+  const targetActiveSmoothed = clamp(Math.round(state.targetActiveSmoothed), 0, state.capacity);
 
   const supplySpeedFactor = 0.72 + input.signal.supply * 0.85;
 
@@ -289,20 +374,60 @@ export const stepSandSimulation = (state: SandSimulationState, input: SandStepIn
     );
 
     const targetSpeed = (state.config.baseWindSpeed + layerProfile.baseSpeed) * input.signal.gust * supplySpeedFactor;
-
     const turbulence =
-      layerProfile.turbulence * (0.55 + input.signal.supply * 0.95) * input.signal.turbulenceBoost;
+      layerProfile.turbulence *
+      (0.55 + input.signal.supply * 0.95) *
+      input.signal.turbulenceBoost *
+      (0.82 + input.signal.gust * 0.28);
 
-    const targetVx = headingCos * targetSpeed + flow.x * turbulence;
-    const targetVy = headingSin * targetSpeed + flow.y * turbulence;
+    const advectionX = headingCos * targetSpeed + flow.x * turbulence;
+    const advectionY = headingSin * targetSpeed + flow.y * turbulence * 0.84;
 
-    state.vx[i] += (targetVx - state.vx[i]) * 0.16;
-    state.vy[i] += (targetVy - state.vy[i]) * 0.16;
+    const heightSafe = Math.max(1, state.height);
+    const shearNormalizedY = state.y[i] / heightSafe - 0.5;
+    const shearForceX = targetSpeed * state.config.shearStrength * shearNormalizedY;
+
+    const responseRate = 2.4 + input.signal.gust * 0.35;
+    const settleReduction = clamp((input.signal.gust - 1) * 0.42, 0, 0.78);
+    const settleAccel =
+      state.config.settleBase *
+      state.config.settleByLayer[layerProfile.index] *
+      (1 - settleReduction);
+
+    const ax = (advectionX - state.vx[i]) * responseRate + shearForceX;
+    const ay = (advectionY - state.vy[i]) * responseRate + settleAccel;
+
+    state.vx[i] += ax * dt;
+    state.vy[i] += ay * dt;
+
+    const speed = Math.hypot(state.vx[i], state.vy[i]);
+    const dragCoefficient =
+      state.config.dragBase *
+      state.config.dragByLayer[layerProfile.index] *
+      (0.48 + speed * 0.022);
+    const dragDamping = Math.max(0, 1 - dragCoefficient * dt);
+
+    state.vx[i] *= dragDamping;
+    state.vy[i] *= dragDamping;
 
     state.x[i] += state.vx[i] * dt;
     state.y[i] += state.vy[i] * dt;
 
     state.life[i] += dt;
+    state.ageNorm[i] = clamp(state.life[i] / Math.max(0.001, state.ttl[i]), 0, 1);
+
+    if (state.fadeRate[i] !== 0) {
+      state.fade[i] = clamp(state.fade[i] + state.fadeRate[i] * dt, 0, 1);
+      if (state.lifecycle[i] === LIFECYCLE_ACTIVE && state.fade[i] >= 1) {
+        state.fade[i] = 1;
+        state.fadeRate[i] = 0;
+      }
+
+      if (state.lifecycle[i] === LIFECYCLE_RETIRING && state.fade[i] <= 0) {
+        hardDeactivateParticle(state, i);
+        continue;
+      }
+    }
 
     sanitizeParticle(state, i);
     if (state.active[i] === 0) {
@@ -317,22 +442,16 @@ export const stepSandSimulation = (state: SandSimulationState, input: SandStepIn
 
     const expired = state.life[i] >= state.ttl[i];
 
-    if (!outOfBounds && !expired) {
+    if (state.lifecycle[i] !== LIFECYCLE_ACTIVE || (!outOfBounds && !expired)) {
       continue;
     }
 
-    if (state.activeCount > targetActiveCount + 8 && input.signal.supply < 0.42 && state.random() < 0.55) {
-      deactivateParticle(state, i);
-      continue;
-    }
-
-    const layerIndex = pickLayerIndexForSpawn(state, input.signal);
-    deactivateParticle(state, i);
-    spawnParticle(state, i, layerIndex, input.signal, headingCos, headingSin);
+    retireParticle(state, i, outOfBounds ? "out-of-bounds" : "ttl-expired");
   }
 
-  if (state.activeCount > targetActiveCount) {
-    trimExcessParticles(state, state.activeCount - targetActiveCount);
+  if (state.activeCount > targetActiveSmoothed) {
+    const retireBudget = Math.max(1, Math.floor(state.capacity * 0.01 * dt * 60));
+    retireExcessParticles(state, Math.min(state.activeCount - targetActiveSmoothed, retireBudget));
   }
 
   const spawnRate =
@@ -342,7 +461,7 @@ export const stepSandSimulation = (state: SandSimulationState, input: SandStepIn
     input.quality.spawnScale;
 
   const spawnBudget = Math.max(1, Math.floor(spawnRate * dt));
-  const spawnTarget = Math.min(targetActiveCount, state.activeCount + spawnBudget);
+  const spawnTarget = Math.min(targetActiveRaw, state.activeCount + spawnBudget);
 
   while (state.activeCount < spawnTarget) {
     const slot = allocateSlot(state);

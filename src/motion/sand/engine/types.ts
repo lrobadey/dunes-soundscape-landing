@@ -51,6 +51,15 @@ export type SandRuntimeConfig = {
   flowScale: number;
   flowTimeScale: number;
   spawnMarginBase: number;
+  fadeInSecMin: number;
+  fadeInSecMax: number;
+  fadeOutSecMin: number;
+  fadeOutSecMax: number;
+  dragBase: number;
+  dragByLayer: [number, number, number];
+  settleBase: number;
+  settleByLayer: [number, number, number];
+  shearStrength: number;
   layerProfiles: SandLayerProfile[];
   stormProfile: SandStormProfile;
   noiseSeed: number;
@@ -74,7 +83,12 @@ export type SandSimulationState = {
   alpha: Float32Array;
   layer: Uint8Array;
   active: Uint8Array;
+  lifecycle: Uint8Array;
+  fade: Float32Array;
+  fadeRate: Float32Array;
+  ageNorm: Float32Array;
   spawnCursor: number;
+  targetActiveSmoothed: number;
   random: () => number;
 };
 

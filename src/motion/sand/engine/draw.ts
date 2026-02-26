@@ -19,6 +19,18 @@ const toHighlightStyle = (hue: number, saturation: number, lightness: number, hi
   return `hsl(${warmHue} ${warmSaturation}% ${warmLightness}%)`;
 };
 
+const computeLifeEnvelope = (ageNorm: number, lifecycle: number) => {
+  const early = clamp(ageNorm / 0.08, 0, 1);
+  const late = clamp((1 - ageNorm) / 0.35, 0, 1);
+  const envelope = clamp(0.24 + 0.76 * Math.min(early, late + 0.25), 0.2, 1);
+
+  if (lifecycle === 2) {
+    return envelope * 0.92;
+  }
+
+  return envelope;
+};
+
 export const drawSandSimulation = (
   ctx: CanvasRenderingContext2D,
   state: SandSimulationState,
@@ -39,18 +51,27 @@ export const drawSandSimulation = (
     ctx.strokeStyle = toFillStyle(profile.hue, profile.saturation, profile.lightness);
     ctx.lineCap = "round";
 
-    const streakThreshold = 0.7 + (1 - dotScaleByLayer[layerIndex]) * 0.8;
+    const baseStreakThreshold = 0.7 + (1 - dotScaleByLayer[layerIndex]) * 0.8;
 
     for (let i = 0; i < state.capacity; i += 1) {
-      if (state.active[i] === 0 || state.layer[i] !== layerIndex) {
+      if (state.active[i] === 0 || state.layer[i] !== layerIndex || state.lifecycle[i] === 0) {
         continue;
       }
 
       const speed = Math.hypot(state.vx[i], state.vy[i]);
       const speedSafe = speed || 1;
 
+      const lifeEnvelope = computeLifeEnvelope(state.ageNorm[i], state.lifecycle[i]);
+      const fade = clamp(state.fade[i], 0, 1);
+      if (fade <= 0) {
+        continue;
+      }
+
+      const streakThresholdAdjust = layerIndex === 0 ? clamp((speed - 28) / 90, 0, 0.16) : 0;
+      const streakThreshold = Math.max(0.48, baseStreakThreshold - streakThresholdAdjust);
+
       const size = state.size[i] * (1 + input.signal.supply * 0.08) * dotScaleByLayer[layerIndex];
-      const alpha = clamp(state.alpha[i] * commonAlphaScale, 0.015, 0.92);
+      const alpha = clamp(state.alpha[i] * commonAlphaScale * fade * lifeEnvelope, 0.002, 0.92);
 
       const streakLength = clamp(
         speed * 0.045 * profile.streakBias * input.quality.streakScale * (input.signal.stormActive ? 1.2 : 1),
