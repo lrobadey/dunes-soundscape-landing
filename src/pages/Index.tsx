@@ -34,8 +34,8 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-background text-foreground">
-      <SandDriftOverlay variant="page" intensity="faint" className="z-[2]" />
-      <div className="relative z-10">
+      <SandDriftOverlay variant="page" intensity="subtle" className="z-[2]" />
+      <div className="relative">
 
       {/* ── HERO ───────────────────────────────────────────────── */}
       <section
