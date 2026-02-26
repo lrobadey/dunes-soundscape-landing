@@ -1,13 +1,10 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { SandWindOverlay } from "@/components/glass/SandWindOverlay";
+import type { SandWindOverlayProps } from "@/components/glass/SandWindOverlay";
 
 type OverlayProps = React.HTMLAttributes<HTMLDivElement>;
-type SandDriftOverlayProps = OverlayProps & {
-  variant?: "page" | "hero" | "transition";
-  intensity?: "faint" | "subtle" | "soft";
-  seed?: string;
-};
+type SandDriftOverlayProps = Omit<SandWindOverlayProps, "children">;
 
 const GridOverlay = ({ className, ...props }: OverlayProps) => {
   return (
@@ -35,6 +32,9 @@ const SandDriftOverlay = ({
   variant = "page",
   intensity = "faint",
   seed = "dunes-page-v1",
+  engine = "canvas",
+  quality = "auto",
+  stormStyle = "cinematic",
   className,
   ...props
 }: SandDriftOverlayProps) => {
@@ -43,6 +43,9 @@ const SandDriftOverlay = ({
       variant={variant}
       intensity={intensity}
       seed={seed}
+      engine={engine}
+      quality={quality}
+      stormStyle={stormStyle}
       className={cn(className)}
       {...props}
     />

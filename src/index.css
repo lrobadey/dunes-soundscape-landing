@@ -287,6 +287,18 @@ All colors MUST be HSL.
     --sand-wind-opacity-scale: 1;
   }
 
+  .sand-wind-canvas-wrap {
+    contain: layout paint style;
+  }
+
+  .sand-wind-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    transform: translate3d(0, 0, 0);
+  }
+
   .sand-wind[data-intensity="subtle"] {
     --sand-wind-opacity-scale: 1.45;
   }

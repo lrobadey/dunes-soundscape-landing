@@ -191,7 +191,7 @@ const Index = () => {
                 <div className="flex flex-col gap-1">
                   <span className="font-sans text-[10px] uppercase tracking-[0.25em] text-primary">Date</span>
                   <span className="font-display text-3xl font-light text-foreground">May 2, 2026</span>
-                  <span className="font-sans text-xs text-muted-foreground">Time TBD</span>
+                  <span className="font-sans text-xs text-muted-foreground">5:00 PM</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="font-sans text-[10px] uppercase tracking-[0.25em] text-primary">Venue</span>

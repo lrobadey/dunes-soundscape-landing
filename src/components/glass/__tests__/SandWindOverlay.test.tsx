@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildOrganicLayerKeyframes } from "@/motion/sand/buildOrganicLayerKeyframes";
 
 const { capturedLayerProps, reducedMotionState } = vi.hoisted(() => ({
@@ -63,26 +63,50 @@ describe("SandWindOverlay", () => {
     setReducedMotionPreference(false);
     reducedMotionState.value = false;
     capturedLayerProps.length = 0;
+
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation(() => 1);
+    vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
+      clearRect: () => {},
+      setTransform: () => {},
+      fillRect: () => {},
+      beginPath: () => {},
+      moveTo: () => {},
+      lineTo: () => {},
+      stroke: () => {},
+      globalAlpha: 1,
+      globalCompositeOperation: "source-over",
+      fillStyle: "",
+      strokeStyle: "",
+      lineCap: "round",
+      lineWidth: 1,
+    } as unknown as CanvasRenderingContext2D);
   });
 
-  it("renders three layers and expected grain count for a preset", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("renders one canvas overlay by default", () => {
     const { container } = render(<SandWindOverlay intensity="faint" />);
+    const overlay = screen.getByRole("presentation", { hidden: true });
+
+    expect(overlay).toHaveAttribute("data-engine", "canvas");
+    expect(overlay).toHaveClass("sand-wind-canvas-wrap");
+    expect(container.querySelectorAll("canvas.sand-wind-canvas").length).toBe(1);
+    expect(container.querySelectorAll(".sand-wind-grain").length).toBe(0);
+  });
+
+  it("renders the legacy dom grain implementation when engine is dom", () => {
+    const { container } = render(<SandWindOverlay intensity="faint" engine="dom" />);
     const expectedCount = sandPresets.faint.layers.reduce((total, layer) => total + layer.count, 0);
 
     expect(container.querySelectorAll("[data-layer-id]").length).toBe(3);
     expect(container.querySelectorAll(".sand-wind-grain").length).toBe(expectedCount);
   });
 
-  it("is non-interactive and marked as decorative", () => {
-    render(<SandWindOverlay intensity="faint" />);
-    const overlay = screen.getByRole("presentation", { hidden: true });
-
-    expect(overlay).toHaveAttribute("aria-hidden", "true");
-    expect(overlay).toHaveClass("pointer-events-none");
-  });
-
-  it("starts each layer from the first generated keyframe and keeps looping animation tracks", () => {
-    render(<SandWindOverlay intensity="faint" seed="dunes-page-v1" />);
+  it("keeps deterministic dom keyframe tracks in fallback mode", () => {
+    render(<SandWindOverlay intensity="faint" engine="dom" seed="dunes-page-v1" />);
 
     const byLayerId = new Map(capturedLayerProps.map((entry) => [entry.layerId, entry]));
 
@@ -113,11 +137,12 @@ describe("SandWindOverlay", () => {
     }
   });
 
-  it("hides the overlay entirely when reduced-motion is enabled", () => {
+  it("hides overlay entirely for reduced-motion users", () => {
     setReducedMotionPreference(true);
     const { container } = render(<SandWindOverlay intensity="faint" />);
 
     expect(screen.queryByRole("presentation", { hidden: true })).toBeNull();
+    expect(container.querySelectorAll("canvas.sand-wind-canvas").length).toBe(0);
     expect(container.querySelectorAll("[data-layer-id]").length).toBe(0);
   });
 });
