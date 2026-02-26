@@ -64,7 +64,11 @@ export const SandWindOverlay = ({
           key={config.id}
           data-layer-id={config.id}
           className="sand-wind-layer"
-          initial={false}
+          initial={{
+            x: keyframes.x[0],
+            y: keyframes.y[0],
+            opacity: keyframes.opacity[0],
+          }}
           animate={{
             x: keyframes.x,
             y: keyframes.y,
