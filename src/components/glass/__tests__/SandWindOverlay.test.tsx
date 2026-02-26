@@ -40,14 +40,11 @@ describe("SandWindOverlay", () => {
     expect(overlay).toHaveClass("pointer-events-none");
   });
 
-  it("switches to reduced-motion mode with static layer settings", () => {
+  it("hides the overlay entirely when reduced-motion is enabled", () => {
     setReducedMotionPreference(true);
     const { container } = render(<SandWindOverlay intensity="faint" />);
-    const overlay = screen.getByRole("presentation", { hidden: true });
-    const layers = Array.from(container.querySelectorAll("[data-layer-id]"));
 
-    expect(overlay).toHaveAttribute("data-reduced-motion", "true");
-    expect(layers.length).toBe(3);
-    expect(layers.every((layer) => layer.getAttribute("style")?.includes("will-change: auto"))).toBe(true);
+    expect(screen.queryByRole("presentation", { hidden: true })).toBeNull();
+    expect(container.querySelectorAll("[data-layer-id]").length).toBe(0);
   });
 });

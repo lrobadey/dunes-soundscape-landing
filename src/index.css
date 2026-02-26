@@ -152,6 +152,37 @@ All colors MUST be HSL.
   }
 }
 
+@keyframes sand-grain-wobble {
+  0% {
+    transform: translate3d(
+      calc(var(--grain-wobble-x, 0px) * -1),
+      calc(var(--grain-wobble-y, 0px) * -1),
+      0
+    );
+  }
+
+  50% {
+    transform: translate3d(var(--grain-wobble-x, 0px), var(--grain-wobble-y, 0px), 0);
+  }
+
+  100% {
+    transform: translate3d(calc(var(--grain-wobble-x, 0px) * -0.8), var(--grain-wobble-y, 0px), 0);
+  }
+}
+
+@keyframes sand-grain-pulse {
+  0%,
+  100% {
+    opacity: calc(var(--grain-opacity, 0.1) * var(--sand-wind-opacity-scale));
+  }
+
+  50% {
+    opacity: calc(
+      var(--grain-opacity, 0.1) * var(--sand-wind-opacity-scale) * var(--grain-pulse-scale, 1.12)
+    );
+  }
+}
+
 @layer utilities {
   .font-display {
     font-family: 'Cormorant Garamond', Georgia, serif;
@@ -277,7 +308,10 @@ All colors MUST be HSL.
     background: hsl(var(--sand-wind-color) / 0.96);
     box-shadow: 0 0 10px hsl(var(--sand-light) / var(--sand-wind-glow));
     transform: translate3d(0, 0, 0);
-    opacity: calc(var(--grain-opacity, 0.1) * var(--sand-wind-opacity-scale));
+    animation:
+      sand-grain-wobble var(--grain-wobble-duration, 8s) ease-in-out var(--grain-wobble-delay, 0s) infinite,
+      sand-grain-pulse var(--grain-pulse-duration, 6s) ease-in-out var(--grain-pulse-delay, 0s) infinite;
+    will-change: transform, opacity;
   }
 
   .sand-wind-mask-page {

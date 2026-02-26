@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import type { CSSProperties, HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import { motion, useReducedMotion } from "@/motion/motion-lib";
+import { buildOrganicLayerKeyframes } from "@/motion/sand/buildOrganicLayerKeyframes";
 import { generateGrains } from "@/motion/sand/generateGrains";
 import { sandPresets } from "@/motion/sand/presets";
 import type { SandMaskVariant, SandPresetName } from "@/motion/sand/types";
@@ -34,11 +35,19 @@ export const SandWindOverlay = ({
   const preset = sandPresets[intensity];
 
   const layers = useMemo(() => {
+    if (reducedMotion) {
+      return [];
+    }
     return preset.layers.map((layer) => ({
       config: layer,
       grains: generateGrains(layer, seed),
+      keyframes: buildOrganicLayerKeyframes(layer, seed),
     }));
-  }, [preset, seed]);
+  }, [preset, reducedMotion, seed]);
+
+  if (reducedMotion) {
+    return null;
+  }
 
   return (
     <div
@@ -46,37 +55,31 @@ export const SandWindOverlay = ({
       role="presentation"
       data-sand-overlay={variant}
       data-intensity={intensity}
-      data-reduced-motion={reducedMotion ? "true" : "false"}
+      data-reduced-motion="false"
       className={cn("pointer-events-none sand-wind", maskClassByVariant[variant], className)}
       {...props}
     >
-      {layers.map(({ config, grains }) => (
+      {layers.map(({ config, grains, keyframes }) => (
         <motion.div
           key={config.id}
           data-layer-id={config.id}
           className="sand-wind-layer"
           initial={false}
-          animate={
-            reducedMotion
-              ? undefined
-              : {
-                  x: [`${config.drift.from}%`, `${config.drift.to}%`],
-                  y: ["0%", `${config.drift.sway}%`, `${-config.drift.sway}%`, "0%"],
-                }
-          }
-          transition={
-            reducedMotion
-              ? undefined
-              : {
-                  duration: config.duration,
-                  ease: "linear",
-                  repeat: Infinity,
-                  repeatType: "loop",
-                }
-          }
+          animate={{
+            x: keyframes.x,
+            y: keyframes.y,
+            opacity: keyframes.opacity,
+          }}
+          transition={{
+            duration: config.duration,
+            ease: "linear",
+            times: keyframes.times,
+            repeat: Infinity,
+            repeatType: "loop",
+          }}
           style={{
             filter: config.blur > 0 ? `blur(${config.blur}px)` : undefined,
-            willChange: reducedMotion ? "auto" : "transform",
+            willChange: "transform, opacity",
           }}
         >
           {grains.map((grain) => (
@@ -89,6 +92,13 @@ export const SandWindOverlay = ({
                 width: `${grain.size}px`,
                 height: `${grain.size}px`,
                 "--grain-opacity": grain.opacity * preset.density,
+                "--grain-wobble-x": `${grain.wobbleX}px`,
+                "--grain-wobble-y": `${grain.wobbleY}px`,
+                "--grain-wobble-duration": `${grain.wobbleDuration}s`,
+                "--grain-wobble-delay": `${grain.wobbleDelay}s`,
+                "--grain-pulse-duration": `${grain.pulseDuration}s`,
+                "--grain-pulse-delay": `${grain.pulseDelay}s`,
+                "--grain-pulse-scale": grain.pulseScale,
               } as CSSProperties}
             />
           ))}

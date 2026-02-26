@@ -25,6 +25,20 @@ describe("generateGrains", () => {
       expect(grain.size).toBeLessThanOrEqual(layer.size.max);
       expect(grain.opacity).toBeGreaterThanOrEqual(layer.opacity.min);
       expect(grain.opacity).toBeLessThanOrEqual(layer.opacity.max);
+      expect(grain.wobbleX).toBeGreaterThanOrEqual(layer.grainMotion.wobbleX.min);
+      expect(grain.wobbleX).toBeLessThanOrEqual(layer.grainMotion.wobbleX.max);
+      expect(grain.wobbleY).toBeGreaterThanOrEqual(layer.grainMotion.wobbleY.min);
+      expect(grain.wobbleY).toBeLessThanOrEqual(layer.grainMotion.wobbleY.max);
+      expect(grain.wobbleDuration).toBeGreaterThanOrEqual(layer.grainMotion.wobbleDuration.min);
+      expect(grain.wobbleDuration).toBeLessThanOrEqual(layer.grainMotion.wobbleDuration.max);
+      expect(grain.pulseDuration).toBeGreaterThanOrEqual(layer.grainMotion.pulseDuration.min);
+      expect(grain.pulseDuration).toBeLessThanOrEqual(layer.grainMotion.pulseDuration.max);
+      expect(grain.pulseScale).toBeGreaterThanOrEqual(layer.grainMotion.pulseScale.min);
+      expect(grain.pulseScale).toBeLessThanOrEqual(layer.grainMotion.pulseScale.max);
+      expect(grain.wobbleDelay).toBeGreaterThanOrEqual(0);
+      expect(grain.wobbleDelay).toBeLessThanOrEqual(6.5);
+      expect(grain.pulseDelay).toBeGreaterThanOrEqual(0);
+      expect(grain.pulseDelay).toBeLessThanOrEqual(4.5);
     }
   });
 });

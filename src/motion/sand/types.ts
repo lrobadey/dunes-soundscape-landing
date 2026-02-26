@@ -8,6 +8,37 @@ export type SandDriftRange = {
   sway: number;
 };
 
+export type SandGustConfig = {
+  keyframes: number;
+  jitter: number;
+  verticalNoise: number;
+  opacityBoost: number;
+  timingVariance: number;
+};
+
+export type SandGrainMotionConfig = {
+  wobbleX: {
+    min: number;
+    max: number;
+  };
+  wobbleY: {
+    min: number;
+    max: number;
+  };
+  wobbleDuration: {
+    min: number;
+    max: number;
+  };
+  pulseDuration: {
+    min: number;
+    max: number;
+  };
+  pulseScale: {
+    min: number;
+    max: number;
+  };
+};
+
 export type SandLayerConfig = {
   id: SandLayerRole;
   count: number;
@@ -21,6 +52,8 @@ export type SandLayerConfig = {
     max: number;
   };
   drift: SandDriftRange;
+  gust: SandGustConfig;
+  grainMotion: SandGrainMotionConfig;
   blur: number;
 };
 
@@ -35,4 +68,18 @@ export type SandGrain = {
   y: number;
   size: number;
   opacity: number;
+  wobbleX: number;
+  wobbleY: number;
+  wobbleDuration: number;
+  wobbleDelay: number;
+  pulseDuration: number;
+  pulseDelay: number;
+  pulseScale: number;
+};
+
+export type SandLayerKeyframes = {
+  x: string[];
+  y: string[];
+  opacity: number[];
+  times: number[];
 };
